@@ -1,0 +1,348 @@
+CASE 1
+
+1 - 
+A causa está na classe RuleEngine e na forma de execução sem pausa alguma e sem um dispose para liberação de recursos.
+É aconselhável a criação de serviço com threads  utilizando  Start e  Stop com time de execução; 
+2 - Primeiro não é aconselhável usar códigos sql hardcod deixando o código difícil de dar manutenção. Implementando uma procedure permite um ganho significativo pois podemos criar planos de execução(execute plan) e verificar o gargalo e tomar as medicas cabíveis, como criação de índices.
+
+        Código sugerido para buscar procedure
+        string connectionString = "Sua string de conexão aqui";
+        string procedureName = "NomeDoSeuProcedimentoArmazenado";
+
+        try
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+
+                using (SqlCommand command = new SqlCommand(procedureName, connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    // Adicionar parâmetros, se houver
+                    // command.Parameters.AddWithValue("@Parametro1", valorParametro1);
+
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            // Processar os dados
+                            // Exemplo: string nome = reader.GetString(0);
+                            //          int id = reader.GetInt32(1);
+                            // ...
+                            Console.WriteLine("Dados: " + reader.GetString(0));
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Erro: " + ex.Message);
+        }
+
+
+
+O ideal seria criar uma PROCEDURE, vamos dar uma exemplo de sql server. 
+usar o 
+SET NOCOUNT ON
+WITH (NOLOCK)
+SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
+
+
+
+
+USE BancoDados
+GO
+CREATE PROCEDURE ListarEventos
+SET NOCOUNT ON
+SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
+/*
+Data criação: 01/08/2025
+Responsável: Victor Barros
+/*
+DECLARE @DATA_ATUAL AS datetine = GETDATE()
+BEGIN
+    -- Seleciona todos os eventos
+    SELECT eventos
+    FROM eventos WITH (NOLOCK)
+    WHERE timestemp >= @DATA_ATUAL ;
+END;
+
+Sugeria mudar também a forma de nomenclatura do arquivo e de salvar o arquivo estendendo a uma classe helper para Salvar esse arquivo de forma que se a pasta temp for deletada o sistema identifica e recria ela, por garantia e também colocaria logs LoggerMessage algum sistema de observabilidade
+
+Incluiria um time de execução em minutos com dispose no serviço
+
+Incluiria threads  utilizando  Start e  Stop. 
+
+
+Isso poderia deixar rodando 1 semana até a refatoração do código
+
+3 -  Criaria uma serviço multithreading e assincrono para melhorar o desempenho e responsividade da aplicação.
+     Usaria inversão de dependência deixando o código menos acoplado e extensível separando as classes de regras de negócios das classes de acesso ao banco de dados
+     Caso fosse preciso usuário expressões lambdas ou LINQ como parallel foreach usando as melhores práticas
+     Uso .NET 9 que tem muitos benefícios para armazenamento e redução de memória Garbage Collection; 
+
+4 - Faria uma boa refatoração já que o processo de deploy para o mesmo já está pronto e facilita implantação
+  
+
+
+CASE 2
+1 - o inicio da hora 10:00:00 percorrendo até às 21:00:00 horas do mesmo dia
+Exemplo, a função rodou 
+linha 1: 10:00:00
+última linha: 21:00:00
+
+2 - 
+Acredito que o sistema  chamando o método GetTimeBucketDictionary() com chave e valor percorreria o tempo de 1 hora entre 00:00,0 até 59:59,00 finalizando em 00:00,0
+
+
+CASE 3
+
+
+1 - 
+Nomenclatura (PascalCase, Snake case, Screaming snake case), para variável o ideal é usar CamelCase com as melhores práticas.
+Pontos negativos é a não utilização de viewModel para input ou output e seria a não utilização da inversão de dependência para deixar o código menos desacoplado.
+Falta de comentários pois facilita muito para quem não tem o conhecimento da chamada
+Garanta segurança com HTTPS (TLS), autenticação e autorização
+Falta o tratamento de erros, exemplo:
+200 OK: Sucesso. 
+400 Bad Request: Requisição inválida. 
+401 Unauthorized: Não autenticado. 
+403 Forbidden: Não autorizado. 
+404 Not Found: Recurso não encontrado. 
+500 Internal Server Error: Erro interno do servidor. 
+Implemente mecanismos de autenticação (ex: OAuth 2.0, JWT) e autorização para proteger seus recursos. 
+
+
+2 -
+Primeiro eu migraria para o web api mvc um framework mais atual utilizando o IActionResult com modelo RestFul
+Implementaria o OpenAPI
+Mudaria para chamadas assíncronas(Task(IActionResult)) e utilizando de  tratamento de erros 
+Implementaria um sistema de observabilidade como métricas, logs e rastreamentos (traces).
+Usaria as melhores práticas de nomenclaturas
+Aplicaria a inversão de dependência 
+Usaria uma ferramenta de mapeamento de input e output chamado: automapper, pode ser instalado direto pelo Nuget
+O AutoMapper é uma biblioteca popular no C# que facilita a conversão automática de objetos de um tipo para outro. 
+Ele é especialmente útil para mapear objetos de domínio para DTOs (Data Transfer Objects) ou vice-versa, eliminando a necessidade de escrever código manual para cada propriedade.
+Implemententaria mecanismos de autenticação (ex: OAuth 2.0, JWT) e autorização para proteger seus recursos. 
+Utilizaria um sistema de cache como o Redis, AWS ElastiCache ou Azure Cache for Redis .
+Incluiria Docker para contêiner 
+Utilizaria o Swagger OpenAPI
+
+CASE 4
+
+// Define a classe Super-Heroi
+public class SuperHeroi
+{
+
+    public string? _voar { get; set; }
+
+    // Construtor da classe Super-Heroi
+    public SuperHeroi(string nome, DateTime dataNascimanento, int nivelKryptonita)
+    {
+        Nome = nome;
+        DataNascimanento = dataNascimanento;
+        NivelKryptonita = nivelKryptonita;
+        Voar = string.Empty;
+    }
+
+
+    // Propriedade para o nome do Super-Heroi
+    public string Nome { get; set; }
+
+    // Propriedade para o data de nascimento do Super-Heroi
+    public DateTime DataNascimanento { get; set; }
+
+    // Propriedade para indicar o status de voo
+    public int NivelKryptonita { get; set; }
+
+    // Se for <2, o Super-Heroi está voando...;
+    public string Voar
+    {
+        get
+        {
+            if (NivelKryptonita < 2)
+            {
+                return "Voando...";
+            }
+            return string.Empty;
+        }
+        set { _voar = value; }
+    }
+
+}
+
+
+CASE 5
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE dbo.ObterDadosInvestidor
+(
+    -- Add parâmetros
+    @Investidor varchar(50),
+    @ProdutoComprado varchar(50) 
+)
+AS
+/*
+-- =============================================
+-- Autor:      Victor Barros
+-- Data Criação: 22/08/2025
+-- Descrição: Retorna dados por parâmetro(Investidor, Produto comprador)
+-- Histórico: Autor, Data Alteração, Observação
+    Autor: Victor Barros
+    Data de Alteração: 22/08/2025
+    Observação : Inclusão do parâmetro @ProdutoComprado ref. ao chamado: xxxxxxxxx
+-- =============================================
+*/
+BEGIN
+    --
+    SET NOCOUNT ON
+    SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
+    
+    DECLARE @Status varchar(3)
+
+	IF object_id('#TempInvestimento') IS NULL
+    BEGIN
+
+		CREATE TABLE #TempInvestimento (
+		Investidor varchar(50),
+		ProdutoComprado varchar(50),
+		Status varchar(3)
+		);
+     END
+
+    --Adciona os registro já existente NOK para cadastro
+    INSERT INTO #TempInvestimento (Investidor, ProdutoComprado, Status) 
+    SELECT 
+     Investidor
+     , ProdutoComprado
+     , Status =  'NOK'
+    FROM 
+     Investimento
+    WHERE 
+     Investidor = @Investidor 
+    AND 
+     ProdutoComprado = @ProdutoComprado;
+
+    --Adciona os registro que não existem OK para cadastro
+    INSERT INTO #TempInvestimento (Investidor, ProdutoComprado, Status) 
+    SELECT 
+     @Investidor
+	 , @ProdutoComprado
+	 , Status =  'OK'
+
+    --Retorna o resultado da tabela temporária
+    SELECT 
+     Investidor
+     , ProdutoComprado
+     , Status
+    FROM  
+
+    #TempInvestimento
+
+	IF object_id('#TempInvestimento') IS NOT NULL
+     DROP TABLE #TempInvestimento
+END
+GO
+
+CASE 6
+ SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE dbo.ObterUltimoPreco
+
+/*
+-- =============================================
+-- Autor:      Victor Barros
+-- Data Criação: 22/08/2025
+-- Descrição: Retorna o último preço de acordo com a regra
+-- Histórico: Autor, Data Alteração, Observação
+    Autor: Victor Barros
+    Data de Alteração: 22/08/2025
+    Observação : Inclusão do parâmetro @StatusDescricao ref. ao chamado: xxxxxxxxx
+-- =============================================
+*/
+AS
+BEGIN
+    --
+    SET NOCOUNT ON
+    SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
+    
+    DECLARE @Status varchar(3)
+	DECLARE @HoraAtual TIME
+	DECLARE @RegraRefData int = NULL
+
+	 SET @HoraAtual = CAST(GETDATE() AS TIME) 
+
+	IF object_id('#TempPreco') IS NULL
+    BEGIN
+
+		CREATE TABLE #TempPreco (
+		 DataReferencia date null
+		, Preco decimal(18, 2)
+		, Status varchar(3),
+		StatusDescricao varchar(50)
+		);
+     END
+
+
+	
+	--Verificar se a hora está entre 10 e 00:00 e add regra ref. a data
+	IF (@HoraAtual <= '10:00' AND @HoraAtual > '00:00')
+		SET @RegraRefData = -1
+
+    --Verificar se a hora está entre 13:00 e 10:00 e add regra ref. a data
+	IF (@HoraAtual <= '13:00' AND @HoraAtual > '10:00')
+		SET @RegraRefData = -5
+
+    --Verificar se a hora está entre 13:00 e 10:00 e add regra ref. a data
+	IF (@HoraAtual > '13:00' AND @HoraAtual < '00:00')
+		SET @RegraRefData = -30
+ 
+
+
+     --Adciona os registro  existente NOK 
+     INSERT INTO #TempPreco (StatusDescricao, Preco, Status) 
+	SELECT 
+	DataReferencia
+	 , Preco
+	, Status =  'OK'
+        FROM
+	   Precos
+	 WHERE	
+	     DataReferencia <= CAST(DATEADD(day, @RegraRefData, GETDATE()) AS date)
+
+
+
+
+   IF NOT EXISTS (SELECT COUNT(DataReferencia) FROM #TempPreco)
+   BEGIN
+    --Adciona os registro não existente NOK 
+		INSERT INTO #TempPreco (Preco, Status, StatusDescricao) 
+		SELECT 
+			 0
+			, Status =  'NOK'
+			, StatusDescricao = 'Preço não encontrato.'
+
+   END
+   
+   SELECT 
+    DataReferencia
+	, Preco
+	, Status
+	, StatusDescricao
+   FROM
+    #TempPreco 
+
+	IF object_id('#TempPreco') IS NOT NULL
+     DROP TABLE #TempInvestimento
+END
+GO
+
