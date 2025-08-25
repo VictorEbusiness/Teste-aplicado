@@ -256,7 +256,7 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-CREATE PROCEDURE dbo.ObterUltimoPreco
+CREATE PROCEDURE dbo.ListarPreco
 
 /*
 -- =============================================
@@ -318,6 +318,8 @@ BEGIN
 	   Precos
 	 WHERE	
 	     DataReferencia <= CAST(DATEADD(day, @RegraRefData, GETDATE()) AS date)
+     ORDER BY 
+         DataReferencia ASC
 
 
 
@@ -345,4 +347,5 @@ BEGIN
      DROP TABLE #TempInvestimento
 END
 GO
+
 
