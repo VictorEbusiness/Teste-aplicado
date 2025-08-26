@@ -278,6 +278,7 @@ BEGIN
     DECLARE @Status varchar(3)
 	DECLARE @HoraAtual TIME
 	DECLARE @RegraRefData int = NULL
+    DECLARE @TotalRegistro int 
 
 	 SET @HoraAtual = CAST(GETDATE() AS TIME) 
 
@@ -321,10 +322,10 @@ BEGIN
      ORDER BY 
          DataReferencia ASC
 
+ SET  @TotalRegistro = SELECT Count(DataReferencia) FROM #TempPreco
 
 
-
-   IF NOT EXISTS (SELECT TOP 1 DataReferencia FROM #TempPreco)
+   IF @TotalRegistro = 0
    BEGIN
     --Adciona os registro não existente NOK 
 		INSERT INTO #TempPreco (Preco, Status, StatusDescricao) 
@@ -347,6 +348,7 @@ BEGIN
      DROP TABLE #TempInvestimento
 END
 GO
+
 
 
 
