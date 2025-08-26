@@ -324,7 +324,7 @@ BEGIN
 
 
 
-   IF NOT EXISTS (SELECT COUNT(DataReferencia) FROM #TempPreco)
+   IF NOT EXISTS (SELECT TOP 1 DataReferencia FROM #TempPreco)
    BEGIN
     --Adciona os registro não existente NOK 
 		INSERT INTO #TempPreco (Preco, Status, StatusDescricao) 
@@ -347,5 +347,6 @@ BEGIN
      DROP TABLE #TempInvestimento
 END
 GO
+
 
 
