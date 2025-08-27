@@ -345,9 +345,10 @@ BEGIN
     #TempPreco 
 
 	IF object_id('#TempPreco') IS NOT NULL
-     DROP TABLE #TempInvestimento
+     DROP TABLE #TempPreco
 END
 GO
+
 
 
 
